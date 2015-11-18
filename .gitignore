@@ -28,3 +28,5 @@ node_modules
 *.o
 *.exe
 *.lnk
+vermiculate.sublime-project
+*.sublime-workspace
