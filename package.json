@@ -5,7 +5,8 @@
   "description": "port of vermiculate screensaver to javascript",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js 1"
+    "test": "node index.js 1",
+    "graphics": "node lib/graphics.js"
   },
   "repository": {
     "type": "git",
