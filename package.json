@@ -18,6 +18,7 @@
     "url": "https://github.com/crosshj/vermiculate/issues"
   },
   "dependencies": {
+    "ffi": "^2.0.0",
     "node-glfw": "^0.4.0",
     "node-webgl": "^0.5.0"
   },
