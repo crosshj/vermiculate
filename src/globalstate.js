@@ -2,22 +2,22 @@ import helpers from './helpers.js';
 import constants from './constants.js';
 
 const {
-  	random1,
-  	createArray,
-  	createObjectsArray,
+	random1,
+	createArray,
+	createObjectsArray,
 } = helpers;
 
 const {
-  	curviness,
-  	thrmax,
-  	sampleStrings,
-  	degs,
-  	degs4,
-  	dtor,
-  	tailmax,
-  	rlmax,
-  	WIN_WIDTH,
-  	WIN_HEIGHT
+	curviness,
+	thrmax,
+	sampleStrings,
+	degs,
+	degs4,
+	dtor,
+	tailmax,
+	rlmax,
+	WIN_WIDTH,
+	WIN_HEIGHT
 } = constants;
 
 var instring = '';
@@ -33,10 +33,10 @@ var ch = '';
 
 var speed = 1;
 function getSpeed(){
-  	return speed;
+	return speed;
 }
 function setSpeed(s){
-  	speed = s;
+	speed = s;
 }
 
 var RGB = createArray(256,3);
@@ -45,20 +45,20 @@ function getRGB(){ return RGB; }
 
 var threads = createObjectsArray(thrmax);
 function setThreads(th){ 
-  	console.log('----------------- SET THREADS');
+	console.log('----------------- SET THREADS');
 	threads = th;
 	return threads; 
 }
 function setForAllThreadsInBank(mutator){
-  	//console.log('----------------- SET ALL THREADS');
+	//console.log('----------------- SET ALL THREADS');
 	threads.forEach(function(th){
-  		//TODO: is thread in bank???
+		//TODO: is thread in bank???
 		mutator(th);
 	})
 	return threads;
 }
 function getThreads(number){ 
-  	//console.log('----------------- GET THREADS');
+	//console.log('----------------- GET THREADS');
 	return typeof number === 'undefined'
 		? threads
 		: threads[number];
@@ -66,89 +66,89 @@ function getThreads(number){
 
 var whichThread = 0;
 function setWhichThread(th){ 
-  	console.log('----------------- SET WHICH THREAD: ' + th);
+	console.log('----------------- SET WHICH THREAD: ' + th);
 	whichThread = th;
 	return whichThread; 
 }
 function getWhichThread(){ 
-  	//console.log('----------------- GET WHICH THREAD: ' + whichThread);
+	//console.log('----------------- GET WHICH THREAD: ' + whichThread);
 	return whichThread; 
 }
 
 var bank = new Array(thrmax);
 function setBank(ba){ 
-  	console.log('----------------- SET BANK');
+	console.log('----------------- SET BANK');
 	bank = ba;
 	return bank; 
 }
 function getBank(){ 
-  	console.log('----------------- GET BANK');
+	console.log('----------------- GET BANK');
 	return bank; 
 }
 
 var bankt = 0;
 function setBankt(bt){ 
-  	console.log('----------------- SET BANK(T): ' + bt);
+	console.log('----------------- SET BANK(T): ' + bt);
 	bankt = bt;
 	return bankt; 
 }
 function getBankt(){ 
-  	console.log('----------------- GET BANK(T): ' + bankt);
+	console.log('----------------- GET BANK(T): ' + bankt);
 	return bankt; 
 }
 
 var bordcol = 1;
 function setBordCol(bc){ 
-  	console.log('----------------- SET BORDCOL: ' + bc);
+	console.log('----------------- SET BORDCOL: ' + bc);
 	bordcol = bc;
 	return bordcol; 
 }
 function getBordCol (){
-  	console.log('----------------- GET BORDCOL: ' + bordcol);
+	console.log('----------------- GET BORDCOL: ' + bordcol);
 	return bordcol;
 }
 
 var bordcorn = 0;
 function setBordCorn(bc){ 
-  	console.log('----------------- SET BORDCORN: ' + bc);
+	console.log('----------------- SET BORDCORN: ' + bc);
 	bordcorn = bc;
 	return bordcorn; 
 }
 function getBordCorn (){
-  	console.log('----------------- GET BORDCORN: ' + bordcorn);
+	console.log('----------------- GET BORDCORN: ' + bordcorn);
 	return bordcorn;
 }
 
 var erasing = true;
 function setErasing(er){ 
-  	//console.log('----------------- SET ERASING: ' + er);
+	//console.log('----------------- SET ERASING: ' + er);
 	erasing = er;
 	return erasing; 
 }
 function getErasing (){
-  	//console.log('----------------- GET ERASING: ' + erasing);
+	//console.log('----------------- GET ERASING: ' + erasing);
 	return erasing;
 }
 
 // typedef struct linedata
 // {
-  //   int deg, spiturn, turnco, turnsize;
-//   unsigned char col;
-//   Bool dead;
+// int deg, spiturn, turnco, turnsize;
+// unsigned char col;
+// Bool dead;
 
-//   char orichar;
-//   real x, y;
-//   int tmode, tsc, tslen, tclim, otslen, ctinc, reclen, recpos, circturn, prey,
-//     slice;
-//   int xrec[rlmax + 1], yrec[rlmax + 1];
-//   int turnseq[50];
-//   Bool filled, killwalls, vhfollow,
-//     selfbounce, tailfollow, realbounce, little;
+// char orichar;
+// real x, y;
+// int tmode, tsc, tslen, tclim, otslen, ctinc, reclen, recpos, circturn, prey,
+// slice;
+// int xrec[rlmax + 1], yrec[rlmax + 1];
+// int turnseq[50];
+// Bool filled, killwalls, vhfollow,
+// selfbounce, tailfollow, realbounce, little;
 // }
 // linedata;
 
 function firstinit(thr){
-  	var LP = threads[thr-1];
+	var LP = threads[thr-1];
 	LP.col = thr + 1;
 	LP.prey = 0;
 	LP.tmode = 1;
@@ -175,12 +175,11 @@ function firstinit(thr){
 	LP.turnseq[4] = -6;
 	LP.turnseq[5] = 6;
 	LP.tclim = Math.floor(degs / 2 / 12); //TODO: not sure this has to be an int, maybe
-
 }
 
 function newonscreen(thr)
 {
-  	var LP = threads[thr-1];
+	var LP = threads[thr-1];
 	LP.filled = false;
 	LP.dead = false;
 	LP.reclen = LP.little
@@ -196,7 +195,7 @@ function newonscreen(thr)
 }
 
 function randpal(){
-  	var co, ro;
+	var co, ro;
 	for (co = 1; co <= 255; co++)
 		for (ro = 0; ro <= 2; ro++)
 			RGB[co][ro] = co > tailmax
@@ -207,9 +206,9 @@ function randpal(){
 }
 
 function palupdate (forceUpdate){
-  		if (forceUpdate || instring === 0){
-  				for (var colnum = 0; colnum < tailmax; colnum++){
-  						//mycolors[colnum].red = rgb[colnum][0] << 10;
+		if (forceUpdate || instring === 0){
+				for (var colnum = 0; colnum < tailmax; colnum++){
+						//mycolors[colnum].red = rgb[colnum][0] << 10;
 						//mycolors[colnum].green = rgb[colnum][1] << 10;
 						//mycolors[colnum].blue = rgb[colnum][2] << 10;
 						//mycolors[colnum].flags = DoRed | DoBlue | DoGreen;
@@ -221,15 +220,15 @@ function palupdate (forceUpdate){
 }
 
 function maininit(){
-  	if (!instring){
-  		var n = random1 (sampleStrings.length);
+	if (!instring){
+		var n = random1 (sampleStrings.length);
 		n=process.argv.slice(2);
 		instring = sampleStrings[n].str;
 		setSpeed(sampleStrings[n].speed);
 	}
 
 	for (var thr = 1; thr <= thrmax; thr++){
-  		firstinit (thr);
+		firstinit (thr);
 		newonscreen (thr);
 	}
 
@@ -238,20 +237,20 @@ function maininit(){
 
 var instringPos = 0;
 function readkey() {
-  		var readkey_result = "";
+		var readkey_result = "";
 		if (!instring[instringPos]){
-  				//TODO:
+				//TODO:
 				//char key_buffer[1];
 				//KeySym key_sym;
 				//if (neednewkey){
-  				//  XWindowEvent (mydpy, mywindow, KeyPressMask, &myevent);
+				//XWindowEvent (mydpy, mywindow, KeyPressMask, &myevent);
 				//}
 				//XLookupString (&myevent.xkey, key_buffer, 1, &key_sym, NULL);
 				//readkey_result = key_sym;
 				readkey_result = '#';
 				//neednewkey = True;
 		} else {
-  			readkey_result = instring[instringPos];
+			readkey_result = instring[instringPos];
 			instringPos++;
 		};
 		console.log("\t\t\t\t\t\t\treadkey: ", readkey_result)
@@ -259,43 +258,58 @@ function readkey() {
 }
 
 function wasakeypressed() {
-  	var instringRemainder = (instring||"").substring(instringPos||"");
+	var instringRemainder = (instring||"").substring(instringPos||"");
 	instringRemainder && console.log("\t"+instringRemainder)
 	return instringRemainder.length > 0;
 }
 
+function getState(){
+	return {
+		bank: getBank(),
+		bankt: getBankt(),
+		threads: getThreads(),
+		whichThread: getWhichThread(),
+		bordCol: getBordCol(),
+		bordCorn: getBordCorn(),
+		erasing: getErasing(),
+		rgb: getRGB(),
+		speed: getSpeed()
+	};
+}
+
 export default {
-  		getBank: getBank,
-		setBank: setBank,
-		getBankt: getBankt,
-		setBankt: setBankt,
+	getState, 
+	getBank: getBank,
+	setBank: setBank,
+	getBankt: getBankt,
+	setBankt: setBankt,
 
-		getThreads: getThreads,
-		setThreads: setThreads,
-		setForAllThreadsInBank: setForAllThreadsInBank,
-		getWhichThread: getWhichThread,
-		setWhichThread: setWhichThread,
+	getThreads: getThreads,
+	setThreads: setThreads,
+	setForAllThreadsInBank: setForAllThreadsInBank,
+	getWhichThread: getWhichThread,
+	setWhichThread: setWhichThread,
 
-		getBordCol: getBordCol,
-		setBordCol: setBordCol,
-		getBordCorn: getBordCorn,
-		setBordCorn: setBordCorn,
+	getBordCol: getBordCol,
+	setBordCol: setBordCol,
+	getBordCorn: getBordCorn,
+	setBordCorn: setBordCorn,
 
-		getErasing: getErasing,
-		setErasing: setErasing,
+	getErasing: getErasing,
+	setErasing: setErasing,
 
-		getRGB: getRGB,
-		setRGB: setRGB, //may not need
+	getRGB: getRGB,
+	setRGB: setRGB, //may not need
 
-		instring: instring,
-		instringPos: instringPos,
-		wasakeypressed: wasakeypressed,
-		newonscreen: newonscreen,
+	instring: instring,
+	instringPos: instringPos,
+	wasakeypressed: wasakeypressed,
+	newonscreen: newonscreen,
 
-		palupdate: palupdate,
-		randpal: randpal, //may not need
-		readkey: readkey,
-		maininit: maininit,
+	palupdate: palupdate,
+	randpal: randpal, //may not need
+	readkey: readkey,
+	maininit: maininit,
 
-		getSpeed, setSpeed
+	getSpeed, setSpeed
 }

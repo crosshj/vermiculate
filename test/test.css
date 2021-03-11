@@ -1,0 +1,65 @@
+body {
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	justify-content: start;
+	overflow: auto;
+	margin: 4em 1.5em;
+	color: #ababab;
+	font-family: monospace;
+	line-height: 1.4em;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #888; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+body > div + .header,
+body > div + .error {
+	margin-top: 2em;
+}
+
+.light-text { color: white; }
+
+.overall-status {
+	padding: 0 0.5em;
+	text-transform: uppercase;
+}
+.overall-status.passed { background: green; }
+.overall-status.failed { background: red; }
+.overall-status.skipped { background: yellow; }
+.overall-status.todo { background: #737; }
+
+.status {
+	margin-left: 1.5em;
+}
+.status.passed:before {
+	content: '√';
+	color: lightgreen;
+}
+.status.failed:before {
+	content: '×';
+	color: red;
+}
+.status.skipped:before {
+	content: '○';
+	color: yellow;
+}
+.status.todo:before {
+	content: '»';
+	color: #b6b;
+}
+
+
+.error {
+	background: #bb002147;
+	color: #f08f8f;
+	padding: 1em;
+	width: 97%;
+}
+
+
+
+
+

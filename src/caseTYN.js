@@ -1,7 +1,7 @@
-import globalstate from '../globalstate.js';
-import helpers from '../helpers.js';
-import constants from '../constants.js';
-import pickbank from '../pickbank.js';
+import globalstate from './globalstate.js';
+import helpers from './helpers.js';
+import constants from './constants.js';
+import pickbank from './pickbank.js';
 
 var WIN_WIDTH = constants.WIN_WIDTH;
 var WIN_HEIGHT = constants.WIN_HEIGHT;
@@ -29,59 +29,57 @@ var bordupdate = helpers.bordupdate;
 var gridupdate = helpers.gridupdate;
 var wasakeypressed = helpers.wasakeypressed;
 
-let ch;
-
-export default function() {
-    		console.log('---------- case_TYN happened');
+export default function(ch) {
+		console.log('---------- case_TYN happened');
 		var boolop = ch;
 		var _cleared = null;
 		pickbank();
 
 		var bankt = getBankt();
 		if(bankt <= 0){
-    			console.log('---------- case_TYN EXIT');
-			return _cleared;
+			console.log('---------- case_TYN EXIT');
+			return { cleared: _cleared };
 		}
 
 		ch = readkey();
 		setForAllThreadsInBank(function(th) {
-    			function bankmod(_bool) {
-    				switch (boolop) {
-    					case 'T':
-						_bool = !_bool;
+			function bankmod(obj, prop) {
+				switch (boolop) {
+					case 'T':
+						obj[prop] = !obj[prop];
 						break;
 					case 'Y':
-						_bool = true;
+						obj[prop] = true;
 						break;
 					case 'N':
-						_bool = false;
+						obj[prop] = false;
 						break;
 				}
 			}
 			switch (ch) {
-    				case 'S':
-					bankmod(th.selfbounce);
+				case 'S':
+					bankmod(th, 'selfbounce');
 					break;
 				case 'V':
-					bankmod(th.vhfollow);
+					bankmod(th, 'vhfollow');
 					break;
 				case 'R':
-					bankmod(th.realbounce);
+					bankmod(th, 'realbounce');
 					break;
 				case 'L':
-					bankmod(th.little);
+					bankmod(th, 'little');
 					//TODO: there is no example of this???
 					_cleared = true;
 					break;
 				case 'T':
-					bankmod(th.tailfollow);
+					bankmod(th, 'tailfollow');
 					break;
 				case 'K':
-					bankmod(th.killwalls);
+					bankmod(th, 'killwalls');
 					break;
 			}
 		});
 
 		console.log('---------- case_TYN EXIT');
-		return _cleared;
+		return { cleared: _cleared };
 }

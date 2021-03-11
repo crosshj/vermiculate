@@ -6,29 +6,16 @@
 
 */
 
-import main from './lib/main.js';
+import main from './src/main.js';
 
-var style = document.createElement('style');
-style.innerHTML = `
-body {
-		display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	height: calc(100vh - 0em);
-	overflow: hidden;
-}
-canvas {
-		/*background: #00000040;*/
-	width: 100%;
-	/*max-width: 1024px;*/
-	ximage-rendering: pixelated;
-	ximage-rendering: crisp-edges;
-}
-`;
+document.body.style.overflow = "hidden";
+document.head.innerHTML += `<link rel="stylesheet" href="index.css">`
 
-document.body.append(style);
 //const CURRENT_CONFIG = 5; //some problems with this * pickbank
-const CURRENT_CONFIG = 12;
+const CURRENT_CONFIG = 3;
 window.process = { argv: [,,CURRENT_CONFIG] };
-main();
+
+main({
+	throttle: 100, //lower throttle is faster
+	seed: 'what okay alright'
+});

@@ -1,87 +1,58 @@
-import globalstate from '../globalstate.js';
-import helpers from '../helpers.js';
-import constants from '../constants.js';
-import pickbank from '../pickbank.js';
-
-var WIN_WIDTH = constants.WIN_WIDTH;
-var WIN_HEIGHT = constants.WIN_HEIGHT;
-var thrmax = constants.thrmax;
-var tmodes = constants.tmodes;
-var degs = constants.degs;
-var degs2 = constants.degs2;
-
-var palupdate = globalstate.palupdate;
-var randpal = globalstate.randpal;
-var newonscreen = globalstate.newonscreen;
-var readkey = globalstate.readkey;
-var getThreads = globalstate.getThreads;
-var setThreads = globalstate.setThreads;
-var getWhichThread = globalstate.getWhichThread;
-var setWhichThread = globalstate.setWhichThread;
-var setForAllThreadsInBank = globalstate.setForAllThreadsInBank;
-var getBank = globalstate.getBank;
-var getBankt = globalstate.getBankt;
-
-var createArray = helpers.createArray;
-var random1 = helpers.random1;
-var include = helpers.include;
-var clearscreen = helpers.clearscreen;
-var bordupdate = helpers.bordupdate;
-var gridupdate = helpers.gridupdate;
-var wasakeypressed = helpers.wasakeypressed;
-
 const clone = x => JSON.parse(JSON.stringify(x));
 
-export default function(){
-    	console.log('---------- case_C happened');
+export default function({
+	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads
+}){
+	console.log('---------- case_C happened');
 	pickbank();
 	var bankt = getBankt();
+	console.log(bankt)
 	if (bankt <= 0) {
-    		console.log('---------- case_C EXIT');
+		console.log('---------- case_C EXIT');
 		return;
 	}
 
 	let ch = readkey();
 	switch (ch) {
-    		case 'D':
+		case 'D':
 			ch = readkey();
 			switch (ch) {
-    				case '1': case '2': case '3':
+				case '1': case '2': case '3':
 				case '4': case '5': case '6':
 				case '7': case '8': case '9':
 					setForAllThreadsInBank(function(th){
-    							th.slice = degs / (ch - '0');
+						th.slice = degs / (ch - '0');
 					});
 					break;
 				case 'M':
 					setForAllThreadsInBank(function(th){
-    							th.slice = 0;
+						th.slice = 0;
 					});
 					break;
 			}
 			break;
 		case 'S': {
-    			setForAllThreadsInBank(function(th){
-    				th.otslen = th.tslen;
-    				th.tslen = 0;
+			setForAllThreadsInBank(function(th){
+				th.otslen = th.tslen;
+				th.tslen = 0;
 			});
 			const bank=getBank();
 			const threads=getThreads();
 			do {
-    				var oldch = ch+"";
+				var oldch = ch+"";
 				ch = readkey();
 				setForAllThreadsInBank(function(th){
-    					switch (ch) {
-    						case '1': case '2': case '3':
+						switch (ch) {
+						case '1': case '2': case '3':
 						case '4': case '5': case '6':
 						case '7': case '8': case '9':
 							th.tslen++;
 							th.turnseq[th.tslen - 1] = ch - '0';
 							if (oldch == '-'){
-    								th.turnseq[th.tslen - 1] *= -1;
+								th.turnseq[th.tslen - 1] *= -1;
 							}
 							if (bankc % 2 == 0){ //TODO: where is bankc set???
-    								th.turnseq[th.tslen - 1] *= -1;
+								th.turnseq[th.tslen - 1] *= -1;
 							}
 							break;
 					}
@@ -90,18 +61,18 @@ export default function(){
 			// c = '\15' is Shift In, js = 16
 
 			setForAllThreadsInBank(function(th){
-    				var seqSum = 0;
+				var seqSum = 0;
 
 				if (th.tslen === 0){
-    					th.tslen = th.otslen;
+					th.tslen = th.otslen;
 				}
 				for (var c = 1; c <= th.tslen; c++){
-    					seqSum += th.turnseq[c - 1];
+					seqSum += th.turnseq[c - 1];
 				}
 				if (seqSum == 0){
-    					th.tclim = 1;
+					th.tclim = 1;
 				} else {
-    					th.tclim = Math.floor(degs2 / Math.abs(seqSum));
+					th.tclim = Math.floor(degs2 / Math.abs(seqSum));
 					th.tsc = random1(th.tslen) + 1;
 				}
 			});
@@ -110,8 +81,8 @@ export default function(){
 		case 'T':
 			ch = readkey();
 			setForAllThreadsInBank(function(th){
-    				switch (ch) {
-    					case '1': case '2': case '3':
+				switch (ch) {
+					case '1': case '2': case '3':
 					case '4': case '5': case '6':
 					case '7': case '8': case '9':
 						th.tmode = ch - '0';
@@ -125,31 +96,30 @@ export default function(){
 		case 'O':
 			ch = readkey(); 
 			setForAllThreadsInBank(function(th){
-    				th.orichar = ch;
+				th.orichar = ch;
 			});
 			break;
 		case 'F':
 			const bank=getBank();
 			const fbank = clone(bank);
 			const fbankt = bankt;
-			pickbank();
+			ch = pickbank();
 			const threads = getThreads();
 			for (var bankc = 1; bankc <= fbankt; bankc++) {
-    				var L = threads[fbank[bankc - 1] - 1];
+				var L = threads[fbank[bankc - 1] - 1];
 				if (ch == 'N'){
-    					L.prey = 0;
+					L.prey = 0;
 				} else {
-    					L.prey = bank[0 + (bankc - 1) % bankt];
+					L.prey = bank[0 + (bankc - 1) % bankt];
 				}
 			}
-			// TODO: because the threads we are working with are just copies, right???
-			//setThreads(threads);
+			setThreads(threads);
 			break;
 		case 'L': {
-    			const bank=getBank();
+			const bank=getBank();
 			const threads = getThreads();
 			for (let bankc = 1; bankc <= bankt; bankc++) {
-    				let L = threads[bank[bankc - 1] - 1];
+				let L = threads[bank[bankc - 1] - 1];
 				L.prey = bank[bankc % bankt];
 			}
 			break;
@@ -157,8 +127,8 @@ export default function(){
 		case 'R':
 			ch = readkey();
 			setForAllThreadsInBank(function(th){
-    				switch (ch) {
-    					case '1': case '2': case '3':
+				switch (ch) {
+					case '1': case '2': case '3':
 					case '4': case '5': case '6':
 					case '7': case '8': case '9':
 						th.circturn = 10 - (ch - '0');

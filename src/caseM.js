@@ -1,6 +1,6 @@
-import globalstate from '../globalstate.js';
-import helpers from '../helpers.js';
-import constants from '../constants.js';
+import globalstate from './globalstate.js';
+import helpers from './helpers.js';
+import constants from './constants.js';
 
 var WIN_WIDTH = constants.WIN_WIDTH;
 var WIN_HEIGHT = constants.WIN_HEIGHT;
@@ -25,19 +25,19 @@ var gridupdate = helpers.gridupdate;
 var wasakeypressed = helpers.wasakeypressed;
 
 export default function caseM() {
-    	console.log('---------- case_M happened');
+	console.log('---------- case_M happened');
 	let threads = getThreads();
 	let ch = readkey();
 	switch (ch) {
-    		case 'A':
+		case 'A':
 		case 'N':
 			var othreads = getWhichThread();
 			if (ch == 'N') setWhichThread(0);
 
 			do {
-    				ch = readkey();
-    				switch (ch) {
-    					case '1': case '2': case '3':
+				ch = readkey();
+				switch (ch) {
+					case '1': case '2': case '3':
 					case '4': case '5': case '6':
 					case '7': case '8': case '9':
 						threads[setWhichThread(getWhichThread()+1)-1].tmode 
@@ -52,7 +52,7 @@ export default function caseM() {
 			// c = '\15' is Shift In, js = 16
 
 			if (getWhichThread() == 0) {
-    				setWhichThread(othreads);
+				setWhichThread(othreads);
 			}
 			break;
 	}

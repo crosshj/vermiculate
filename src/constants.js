@@ -1,41 +1,85 @@
 var sampleStrings =
 [
-  	//0
-  	{ str: "]]]]]]]]7ces123400-9-8#c123456#s9998880004#ma3#car9ma6#c-#r1", speed: 600 },
+	//0
+	{ str: "]]]]]]]]7ces123400-9-8#c123456#s9998880004#ma3#car9ma6#c-#r1", speed: 600 },
 	{ str: "emn1", speed: 600 }, //simple
 	{ str: "bmarrrr#c1234#lc5678#lyet]", speed: 600 },
 	{ str: "mn333#c23#f1#]]]]]]]]]]]3bc9#r9#c78#f9#ma4#", speed: 600 },
 	{ str: "AEBMN22222#CAD4CAORc1#f2#c1#r6", speed: 100 },
-	//6
+	//5
 	{ str: "mn6666666#c1i#f1#y2#sy2#vyety1#ry13i#l", speed: 40 },
 	{ str: "aebmnrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#", speed: 500 },
 	{ str: "BMN22222223#CAD4CAOVYAS", speed: 150 },
 	{ str: "aebmnrrrrrrrrrrrrrrrr#yaryakg--#", speed: 100 },
 	{ str: "mn6rrrrrrrrrrrrrrr#by1i#lcalc1#fnyav", speed: 200  },
-	//11
+	//10
 	{ str: "mn1rrrrrrrrrrrrrrr#by1i#lcalc1#fn", speed: 200 },
 	{ str: "AEBMN222222223#CAR9CAD4CAOV", speed: 150 },
 	{ str: "AEBMN22222#CAD4CAORc1#f2#c1#r6", speed: 100 },
 	{ str: "mn6666666#c1i#f1#y2#sy2#vyety1#ry13i#l", speed: 40 },
 	{ str: "aebmnrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#", speed: 500 },
-	//16
+	//15
 	{ str: "bg+++++++++++++++++++++++#mnrrrrrrrrrrrrrrrrrrrrrrr#y1#k", speed: 500 },
 	{ str: "mn6rrrrrrrrrrrrrrr#by1i#lcalc1#fnyav" , speed: 200  },
 	{ str: "baeMn333333333333333333333333#CerrYerCal", speed: 800 },
 	{ str: "baMn111111222222333333444444555555#Ct1#lCt2#lCt3#lCt4#lCt5#lCerrYerYet", speed: 1400 },
 	{ str: "baMn111111222222333333444444555555#Ct1#lCt2#lCt3#lCt4#lCt5#lCerrYerYetYt1i#lYt1i#sYt1#v", speed: 1400 },
-	//21
+	//20
 	{ str: "AEBMN222222223#CAR9CAD4CAOV", speed: 150 },
 	{ str: "bg+++++++++++++++++++++++#mnrrrrrrrrrrrrrrrrrrrrrrr#y1#k", speed: 500 },
 	{ str: "]]]]]]]]7ces123400-9-8#c123456#s9998880004#ma3#car9ma6#c-#r1", speed: 600 },
 	{ str: "bmarrrr#c1234#lc5678#lyet]", speed: 600 },
 	{ str: "mn333#c23#f1#]]]]]]]]]]]3bc9#r9#c78#f9#ma4#", speed: 600 },
-	//26
+	//25
 	{ str: "BMN22222223#CAD4CAOVYAS", speed: 150 },
 	{ str: "aebmnrrrrrrrrrrrrrrrr#yaryakg--#", speed: 100 },
 	{ str: "mn1rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#by1i#lcalc1#fn", speed: 2000 },
 	{ str: "baeMn1111111111111111111111111111111111111111111111111111111111#Cer9YesYevYerCal", speed: 1200 },
+	
+	//other found on github
+	// https://github.com/fnatter/ball2d/blob/647a7c43e0fb8bc4ede52ee070154dfa357428de/xscreensaver-5.35/hacks/vermiculate.c
+	{ str: "]]]]]]]]7ces123400-9-8#c123456#s9998880004#ma3#car9ma6#c-#r1", speed: 600} ,
+	//30
+	{ str: "bmarrrr#c1234#lc5678#lyet]", speed: 600},
+	{ str: "AEBMN222222223#CAR9CAD4CAOV", speed: 150} ,
+	{ str: "mn333#c23#f1#]]]]]]]]]]]3bc9#r9#c78#f9#ma4#", speed: 600} ,
+	{ str: "AEBMN22222#CAD4CAORc1#f2#c1#r6", speed: 100} ,
+	{ str: "mn6666666#c1i#f1#y2#sy2#vyety1#ry13i#l", speed: 40} ,
+	//35
+	{ str: "aebmnrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#", speed: 500} ,
+	{ str: "bg+++++++++++++++++++++++#mnrrrrrrrrrrrrrrrrrrrrrrr#y1#k", speed: 500},
+	{ str: "BMN22222223#CAD4CAOVYAS", speed: 150},
+	{ str: "aebmnrrrrrrrrrrrrrrrr#yaryakg--#", speed: 100} ,
+	{ str: "mn6rrrrrrrrrrrrrrr#by1i#lcalc1#fnyav" , speed: 200 } ,
+	//40
+	{ str: "mn1rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#by1i#lcalc1#fn", speed: 2000 },
+	{ str: "baeMn333333333333333333333333#CerrYerCal", speed: 800 },
+	{ str: "baeMn1111111111111111111111111111111111111111111111111111111111#Cer9YesYevYerCal", speed: 1200 },
+	{ str: "baMn111111222222333333444444555555#Ct1#lCt2#lCt3#lCt4#lCt5#lCerrYerYet", speed: 1400 },
+	{ str: "baMn111111222222333333444444555555#Ct1#lCt2#lCt3#lCt4#lCt5#lCerrYerYetYt1i#lYt1i#sYt1#v", speed: 1400 },
 ];
+/*
+// https://github.com/fnatter/ball2d/blob/647a7c43e0fb8bc4ede52ee070154dfa357428de/xscreensaver-5.35/hacks/vermiculate.c
+
+{
+/*  { "]]]]]]]]7ces123400-9-8#c123456#s9998880004#ma3#car9ma6#c-#r1", 600} , 
+	{ "bmarrrr#c1234#lc5678#lyet]", 600} , 
+  { "AEBMN222222223#CAR9CAD4CAOV", 150} ,
+  { "mn333#c23#f1#]]]]]]]]]]]3bc9#r9#c78#f9#ma4#", 600} ,
+  { "AEBMN22222#CAD4CAORc1#f2#c1#r6", 100} , 
+/*  { "mn6666666#c1i#f1#y2#sy2#vyety1#ry13i#l", 40} , 
+  { "aebmnrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#", 500} , 
+/*  { "bg+++++++++++++++++++++++#mnrrrrrrrrrrrrrrrrrrrrrrr#y1#k", 500},  
+/*  { "BMN22222223#CAD4CAOVYAS", 150}, */
+/*  { "aebmnrrrrrrrrrrrrrrrr#yaryakg--#", 100} , 
+  { "mn6rrrrrrrrrrrrrrr#by1i#lcalc1#fnyav" , 200 } ,
+  { "mn1rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#by1i#lcalc1#fn", 2000 },
+  { "baeMn333333333333333333333333#CerrYerCal", 800 },
+  { "baeMn1111111111111111111111111111111111111111111111111111111111#Cer9YesYevYerCal", 1200 },
+  { "baMn111111222222333333444444555555#Ct1#lCt2#lCt3#lCt4#lCt5#lCerrYerYet", 1400 },
+  { "baMn111111222222333333444444555555#Ct1#lCt2#lCt3#lCt4#lCt5#lCerrYerYetYt1i#lYt1i#sYt1#v", 1400 }
+}
+*/
 
 var degs = 360;
 const degs2 = (degs/2);
