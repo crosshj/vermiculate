@@ -12,10 +12,10 @@ document.body.style.overflow = "hidden";
 document.head.innerHTML += `<link rel="stylesheet" href="index.css">`
 
 //const CURRENT_CONFIG = 5; //some problems with this * pickbank
-const CURRENT_CONFIG = 3;
+const CURRENT_CONFIG = 2;
 window.process = { argv: [,,CURRENT_CONFIG] };
 
 main({
-	throttle: 100, //lower throttle is faster
+	throttle: 300, //lower throttle is faster
 	seed: 'what okay alright'
 });

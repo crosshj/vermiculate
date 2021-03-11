@@ -1,7 +1,7 @@
 const clone = x => JSON.parse(JSON.stringify(x));
 
 export default function({
-	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads
+	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads
 }){
 	console.log('---------- case_C happened');
 	pickbank();
