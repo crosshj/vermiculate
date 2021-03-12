@@ -1,3 +1,17 @@
+import constants from './constants.js';
+
+const {
+	degs,
+	degs2,
+	degs4,
+	degs8,
+	dtor,
+	cosof,
+	sinof,
+	tanof,
+	curviness,
+	thrmax,
+} = constants;
 const clone = x => JSON.parse(JSON.stringify(x));
 
 export default function({

@@ -86,22 +86,23 @@ const keyPressHandler = ({ cleared, halted }) => {
 		if(typeof res.cleared !== 'undefined') _cleared = res.cleared;
 		return true; //loop
 	}
-	
+
 	const logs = [];
 	console.bak = console.log;
 	console.log = (...args) => logs.push(args.join(' ').trim());
-	
+
 	//eat all input until done
 	loop(handler);
-	
-	console.log = console.bak;
-	logs.length && console.log(
-		logs.filter(x=>x.includes('DON\'T KNOW ABOUT THIS CASE')).join('\n')
-	);
-	
-	window.state = getState();
-	console.log(window.state);
 
+	console.log = console.bak;
+	if(logs.length){
+		logs.length && console.log(
+			logs.filter(x=>x.includes('DON\'T KNOW ABOUT THIS CASE')).join('\n')
+		);
+		window.state = getState();
+		console.log(window.state);
+	}
+	
 	return {
 		cleared: _cleared,
 		halted: _halted
