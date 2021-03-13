@@ -1,4 +1,9 @@
 import constants from './constants.js';
+import helpers from './helpers.js';
+const {
+	loop, asyncLoop, createArray, random1, clearscreen,
+	bordupdate, gridupdate, sleep, setRNGSeed
+} = helpers;
 
 const {
 	degs,
@@ -17,14 +22,9 @@ const clone = x => JSON.parse(JSON.stringify(x));
 export default function({
 	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads
 }){
-	console.log('---------- case_C happened');
 	pickbank();
 	var bankt = getBankt();
-	console.log(bankt)
-	if (bankt <= 0) {
-		console.log('---------- case_C EXIT');
-		return;
-	}
+	if (bankt <= 0) return;
 
 	let ch = readkey();
 	switch (ch) {
@@ -35,7 +35,7 @@ export default function({
 				case '4': case '5': case '6':
 				case '7': case '8': case '9':
 					setForAllThreadsInBank(function(th){
-						th.slice = degs / (ch - '0');
+						th.slice = degs / (Number(ch));
 					});
 					break;
 				case 'M':
@@ -55,17 +55,17 @@ export default function({
 			do {
 				var oldch = ch+"";
 				ch = readkey();
-				setForAllThreadsInBank(function(th){
+				setForAllThreadsInBank(function(th, bankc){
 						switch (ch) {
 						case '1': case '2': case '3':
 						case '4': case '5': case '6':
 						case '7': case '8': case '9':
 							th.tslen++;
-							th.turnseq[th.tslen - 1] = ch - '0';
+							th.turnseq[th.tslen - 1] = Number(ch);
 							if (oldch == '-'){
 								th.turnseq[th.tslen - 1] *= -1;
 							}
-							if (bankc % 2 == 0){ //TODO: where is bankc set???
+							if (bankc % 2 == 0){
 								th.turnseq[th.tslen - 1] *= -1;
 							}
 							break;
@@ -99,7 +99,7 @@ export default function({
 					case '1': case '2': case '3':
 					case '4': case '5': case '6':
 					case '7': case '8': case '9':
-						th.tmode = ch - '0';
+						th.tmode = Number(ch);
 						break;
 					case 'R':
 						th.tmode = random1(tmodes - '0') + 1;
@@ -130,12 +130,9 @@ export default function({
 			setThreads(threads);
 			break;
 		case 'L': {
-			const bank=getBank();
-			const threads = getThreads();
-			for (let bankc = 1; bankc <= bankt; bankc++) {
-				let L = threads[bank[bankc - 1] - 1];
-				L.prey = bank[bankc % bankt];
-			}
+			setForAllThreadsInBank((th, bankc) => {
+				th.prey = getBank()[bankc % getBankt()];
+			});
 			break;
 		}
 		case 'R':
@@ -145,7 +142,7 @@ export default function({
 					case '1': case '2': case '3':
 					case '4': case '5': case '6':
 					case '7': case '8': case '9':
-						th.circturn = 10 - (ch - '0');
+						th.circturn = 10 - (Number(ch));
 						break;
 					case 'R':
 						th.circturn = random1(7) + 1;

@@ -42,7 +42,9 @@ export const caseEscape = () => ({ halted: true });
 
 export const caseSpace = () => ({ cleared: true });
 
-export const caseErasing = () => setErasing(!getErasing());
+export const caseErasing = () => {
+	setErasing(!getErasing());
+}
 
 export const unknownCase = (ch) => () => {
 	console.log(`----- DON'T KNOW ABOUT THIS CASE [ ${ch} ] ----`)
@@ -53,4 +55,8 @@ export const caseAddThread = () => {
 	if (lastThreadNumber >= thrmax) return;
 	newonscreen(lastThreadNumber+1);
 	setWhichThread(lastThreadNumber+1);
+};
+
+export const caseBorder = () => {
+	// don't really care about borders?
 };

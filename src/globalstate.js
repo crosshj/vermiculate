@@ -50,12 +50,11 @@ function setThreads(th){
 	return threads; 
 }
 function setForAllThreadsInBank(mutator){
-	//console.log('----------------- SET ALL THREADS');
-	threads.forEach(function(th){
-		//TODO: is thread in bank???
-		mutator(th);
-	})
-	return threads;
+	const bankThreads = bank.map(b => threads[b-1]);
+	bankThreads.forEach((th,i) => {
+		mutator(th, i+1);
+	});
+	return bankThreads;
 }
 function getThreads(number){ 
 	//console.log('----------------- GET THREADS');
@@ -177,8 +176,7 @@ function firstinit(thr){
 	LP.tclim = Math.floor(degs / 2 / 12); //TODO: not sure this has to be an int, maybe
 }
 
-function newonscreen(thr)
-{
+function newonscreen(thr){
 	var LP = threads[thr-1];
 	LP.filled = false;
 	LP.dead = false;
@@ -225,6 +223,10 @@ function maininit(){
 		n=process.argv.slice(2);
 		instring = sampleStrings[n].str;
 		setSpeed(sampleStrings[n].speed);
+		console.log(`
+			CONFIG: ${instring}
+			SPEED: ${sampleStrings[n].speed}
+		`.replace(/^\t\t\t/gm, ''));
 	}
 
 	for (var thr = 1; thr <= thrmax; thr++){
@@ -311,5 +313,6 @@ export default {
 	readkey: readkey,
 	maininit: maininit,
 
-	getSpeed, setSpeed
+	getSpeed, setSpeed,
+	gridden
 }

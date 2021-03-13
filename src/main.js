@@ -10,7 +10,7 @@ import caseM from './caseM.js';
 import caseTYN from './caseTYN.js';
 import { 
 	caseR , caseNumbers, caseEscape , caseSpace, caseErasing, unknownCase,
-	caseAddThread
+	caseAddThread, caseBorder
 } from './caseOthers.js'
 
 const {
@@ -21,7 +21,8 @@ const {
 	getBordCol, setBordCol,
 	getBordCorn, setBordCorn,
 	getErasing, getSpeed,
-	getBank, getBankt, setForAllThreadsInBank 
+	getBank, getBankt, setForAllThreadsInBank,
+	gridden
 } = globalstate;
 
 const {
@@ -34,6 +35,7 @@ const {
 } = constants;
 
 const mainMap = {
+	B: caseBorder,
 	M: caseM,
 	C: caseC,
 	R: caseR,
@@ -80,7 +82,7 @@ const keyPressHandler = ({ cleared, halted }) => {
 		if(!ch) return false;
 		const caseHandler = mainMap[ch] || unknownCase(ch);
 		const res = caseHandler({
-			pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads
+			pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads, ch
 		}) || {};
 		if(typeof res.halted !== 'undefined') _halted = res.halted;
 		if(typeof res.cleared !== 'undefined') _cleared = res.cleared;

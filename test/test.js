@@ -1,32 +1,40 @@
 //show-preview
-import { describe, it, QUnit } from './framework.js';
-import constants from '../src/constants.js';
+import { describe, it, Mock, expect } from './framework.js';
 
+import constants from '../src/constants.js';
 import caseC from '../src/caseC.js';
+import caseTYN from '../src/caseTYN.js';
 
 const { sampleStrings } = constants;
+const logJSON = x => console.log(JSON.stringify(x,null,2))
 
-describe('Init string parsing: Overall', ({ before }) => {
+const readkeyMock = k => k.shift.bind(k);
+const pickbankMock = (readkey, exitOn) => () => {
+	while( ![exitOn, '#', 'N', undefined].includes(readkey()) ){}
+};
+
+/*
+	+ prey behavior
+	0) not active?
+	1) straight w/ slight wiggle
+	2) zig-zag triangles
+	3) circular
+	4) swirly | ornate
+	5) wiggle | sinusoidal
+	6) oblong | stone-shaped
+	7) rounded 4-point star | clover
+*/
+
+describe('initstring: Overall', ({ before }) => {
 	before(() => {
-		console.log(sampleStrings)
+		//console.log(sampleStrings)
 	})
-	it.todo('should parse init string without side effects');
+	it.todo('should parse init string without side effects, ie. no dependency injection');
 	it.todo('should connect with app in way that allows decoupling');
 	it.todo('should connect and code all missing cases');
 })
 
-describe('Init string parsing: Case C', ({ beforeEach }) => {
-	let called = [];
-	const mock = (name, res) => (...args) => {
-		called.push({ name, args });
-		return res;
-	};
-
-	
-	beforeEach(() => {
-		called = [];
-	});
-
+describe('initstring: Case C', () => {
 	it.todo('should figure out what this is really for and clarify');
 
 	it.todo('should handle: CD{numbers}', ({ assert}) => {
@@ -40,57 +48,64 @@ describe('Init string parsing: Case C', ({ beforeEach }) => {
 	it.todo('should handle: CT{numbers}');
 	it.todo('should handle: CTR');
 
-	it('should handle: CO{any character}', (assert) => {
+	it('should handle: CO{any character}', () => {
 		const charToSet = 'X';
 		const arbitraryBankNumber = 9;
-		const readkey = (k => () => k.shift())(['O', charToSet]);
 		const threads = [{}, {}];
-		const setForAllThreadsInBank = fn => threads.forEach(fn);
+		const args = {
+			readkey: readkeyMock(['O', charToSet]),
+			setForAllThreadsInBank: fn => threads.forEach(fn),
+			// warning, real pickbank calls readkey
+			pickbank: new Mock(),
+			getBankt: new Mock().returns(arbitraryBankNumber),
+			getThreads: new Mock().returns(threads),
+		};
 
-		caseC({
-			readkey,
-			//WARNING: pickbank calls readkey
-			pickbank: mock('pickbank'),
-			getBankt: mock('getBankt', arbitraryBankNumber),
-			setForAllThreadsInBank
-		})
+		caseC(args)
 
-		assert.true(called.some(({ name, args }) => name === 'pickbank' && args.length === 0));
-		assert.true(called.some(({ name, args }) => name === 'getBankt' && args.length === 0));
-		assert.true(threads[0].orichar === charToSet);
-		assert.true(threads[1].orichar === charToSet);
+		expect(args.pickbank.wasCalled).toEqual(true);
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(threads.every(x => x.orichar === charToSet)).toEqual(true);
 	});
 
 	it.todo('should handle: CF{numbers only?}');
 	it.todo('should handle: CFN');
 
-	it('should handle: CL', (assert) => {
-		//c1234#l
-		//c5678#l
-		const arbitraryBankNumber = 2;
-		const readkey = (k => () => k.shift())(['L']);
-		const threads = [{}, {}];
-		const setForAllThreadsInBank = fn => threads.forEach(fn);
-
-		caseC({
+	it('should handle: C{numbers-pound}L', () => {
+		//NOTE: in this case, a bank of threads is set with prey (lead?)
+		const inputString = 'c1234#l'.toUpperCase();
+		const state = {
+			bankt: 4,
+			threads: [{},{},{},{}], //simluate app threads
+			bank: [1,2,3,4] // simulate pickbank "1234#"
+		};
+		const readkey = readkeyMock(inputString.split(''));
+		const args = {
 			readkey,
-			//WARNING: pickbank calls readkey
-			pickbank: mock('pickbank'),
-			getBankt: mock('getBankt', arbitraryBankNumber),
-			getBank: mock('getBank', [1,2]),
-			getThreads: mock('getThreads', threads),
-			setForAllThreadsInBank
-		});
+			setForAllThreadsInBank: (fn) => state.bank.forEach((b,i) => {
+				return fn(state.threads[b-1], i+1);
+			}),
+			pickbank: pickbankMock(readkey),
+			getBankt: new Mock().returns(state.bankt),
+			getBank: new Mock().returns(state.bank),
+			getThreads: new Mock().returns(state.threads),
+		};
 
-		console.log(threads)
-		assert.true(true);
+		const firstRead = args.readkey();
+		caseC(args);
+		
+		logJSON(state)
+
+		expect(firstRead).toEqual('C');
+		expect(state.threads.every(x => Number.isInteger(x.prey))).toEqual(true);
+		expect(state.threads.map(x=>x.prey).join('')).toEqual('2341')
 	});
 
 	it.todo('should handle: CRR');
 	it.todo('should handle: CR{numbers}');
 });
 
-describe('Init string parsing: Case M', () => {
+describe('initstring: Case M', () => {
 	it.todo('should figure out what this is really for and clarify');
 
 	it.todo('should handle: MA{numbers}#');
@@ -100,7 +115,7 @@ describe('Init string parsing: Case M', () => {
 	it.todo('should handle: MNR#');
 });
 
-describe('Init string parsing: Case Others', () => {
+describe('initstring: Case Others', () => {
 	it.todo('should figure out what Case R really for and clarify');
 	it.todo('should handle: R');
 	
@@ -117,30 +132,241 @@ describe('Init string parsing: Case Others', () => {
 	it.todo('should handle: [');
 });
 
-describe('Init string parsing: Case TYN (change thread properties)', () => {
-	it.todo('should handle: TS');
-	it.todo('should handle: TV');
-	it.todo('should handle: TR');
-	it.todo('should handle: TL');
-	it.todo('should handle: TT');
-	it.todo('should handle: TK');
+describe('initstring: Case TYN (change thread properties)', () => {
+	const setupTest = (inputString) => {
+		const state = {
+			bankt: 4,
+			threads: [{},{},{},{}], //simluate app threads
+			bank: [1,2,3,4] // simulate pickbank "1234#"
+		};
+		const readkey = readkeyMock(inputString.toUpperCase().split(''));
+		const args = {
+			readkey, 
+			setForAllThreadsInBank: (fn) => state.bank.forEach((b,i) => {
+				return fn(state.threads[b-1], i+1);
+			}),
+			pickbank: pickbankMock(readkey, 'E'),
+			getBankt: new Mock().returns(state.bankt),
+			getBank: new Mock().returns(state.bank),
+			getThreads: new Mock().returns(state.threads),
+		};
+		return { state, args };
+	};
 
-	it.todo('should handle: YS');
-	it.todo('should handle: YV');
-	it.todo('should handle: YR');
-	it.todo('should handle: YL');
-	it.todo('should handle: YT');
-	it.todo('should handle: YK');
+	it('should change only the threads that pickbank selects', () => {
+		const { state, args } = setupTest('tes');
+		state.bank = [1,4];
 
-	it.todo('should handle: NS');
-	it.todo('should handle: NV');
-	it.todo('should handle: NR');
-	it.todo('should handle: NL');
-	it.todo('should handle: NT');
-	it.todo('should handle: NK');
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.bank.every(x=>typeof state.threads[x-1].selfbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.selfbounce?'T':'F').join('')).toEqual('TFFT');
+	});
+	
+	it('should toggle self bounce', () => {
+		const { state, args } = setupTest('tes');
+		state.threads[0].selfbounce = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.selfbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.selfbounce?'T':'F').join('')).toEqual('FTTT');
+	});
+	it('should toggle vhfollow', () => {
+		const { state, args } = setupTest('tev');
+		state.threads[0].vhfollow = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.vhfollow !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.vhfollow?'T':'F').join('')).toEqual('FTTT');
+	});
+	it('should toggle realbounce', () => {
+		const { state, args } = setupTest('ter');
+		state.threads[0].realbounce = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.realbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.realbounce?'T':'F').join('')).toEqual('FTTT');
+	});
+	it('should toggle little', () => {
+		const { state, args } = setupTest('tel');
+		state.threads[0].little = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.little !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.little?'T':'F').join('')).toEqual('FTTT');
+	});
+	it('should toggle tailfollow', () => {
+		const { state, args } = setupTest('tet');
+		state.threads[0].tailfollow = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.tailfollow !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.tailfollow?'T':'F').join('')).toEqual('FTTT');
+	});
+	it('should toggle killwalls', () => {
+		const { state, args } = setupTest('tek');
+		state.threads[0].killwalls = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.killwalls !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.killwalls?'T':'F').join('')).toEqual('FTTT');
+	});
+
+	it('should set selfbounce TRUE', () => {
+		const { state, args } = setupTest('yes');
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.selfbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.selfbounce?'T':'F').join('')).toEqual('TTTT');
+	});
+	it('should set vhfollow TRUE', () => {
+		const { state, args } = setupTest('yev');
+		state.threads[0].vhfollow = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.vhfollow !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.vhfollow?'T':'F').join('')).toEqual('TTTT');
+	});
+	it('should set realbounce TRUE', () => {
+		const { state, args } = setupTest('yer');
+		state.threads[0].realbounce = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.realbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.realbounce?'T':'F').join('')).toEqual('TTTT');
+	});
+	it('should set little TRUE', () => {
+		const { state, args } = setupTest('yel');
+		state.threads[0].little = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.little !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.little?'T':'F').join('')).toEqual('TTTT');
+	});
+	it('should set tailfollow TRUE', () => {
+		const { state, args } = setupTest('yet');
+		state.threads[0].tailfollow = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.tailfollow !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.tailfollow?'T':'F').join('')).toEqual('TTTT');
+	});
+	it('should set killwalls TRUE', () => {
+		const { state, args } = setupTest('yek');
+		state.threads[0].killwalls = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.killwalls !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.killwalls?'T':'F').join('')).toEqual('TTTT');
+	});
+
+	it('should set selfbounce FALSE', () => {
+		const { state, args } = setupTest('nes');
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.selfbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.selfbounce?'T':'F').join('')).toEqual('FFFF');
+	});
+	it('should set vhfollow FALSE', () => {
+		const { state, args } = setupTest('nev');
+		state.threads[0].vhfollow = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.vhfollow !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.vhfollow?'T':'F').join('')).toEqual('FFFF');
+	});
+	it('should set realbounce FALSE', () => {
+		const { state, args } = setupTest('ner');
+		state.threads[0].realbounce = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.realbounce !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.realbounce?'T':'F').join('')).toEqual('FFFF');
+	});
+	it('should set little FALSE', () => {
+		const { state, args } = setupTest('nel');
+		state.threads[0].little = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.little !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.little?'T':'F').join('')).toEqual('FFFF');
+	});
+	it('should set tailfollow FALSE', () => {
+		const { state, args } = setupTest('net');
+		state.threads[0].tailfollow = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.tailfollow !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.tailfollow?'T':'F').join('')).toEqual('FFFF');
+	});
+	it('should set killwalls FALSE', () => {
+		const { state, args } = setupTest('nek');
+		state.threads[0].killwalls = true;
+
+		const firstRead = args.readkey();
+		caseTYN({ ch: firstRead, ...args });
+
+		expect(args.getBankt.wasCalled).toEqual(true);
+		expect(state.threads.every(x=>typeof x.killwalls !== 'undefined')).toEqual(true);
+		expect(state.threads.map(x=>x.killwalls?'T':'F').join('')).toEqual('FFFF');
+	});
+
 });
 
-describe('Init string parsing: pickbank', () => {
+describe('initstring: pickbank', () => {
 	it.todo('should figure out what this is really for and clarify');
 	it.todo('should handle: +');
 	it.todo('should handle: -');
@@ -154,3 +380,4 @@ describe('Init string parsing: pickbank', () => {
 	it.todo('should handle: A');
 	it.todo('should handle: E');
 });
+

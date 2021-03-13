@@ -28,7 +28,7 @@ body > div + .error {
 }
 .overall-status.passed { background: green; }
 .overall-status.failed { background: red; }
-.overall-status.skipped { background: yellow; }
+.overall-status.skipped { background: sienna; color: gainsboro; }
 .overall-status.todo { background: #737; }
 
 .status {

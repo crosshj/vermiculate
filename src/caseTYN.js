@@ -1,7 +1,5 @@
-import globalstate from './globalstate.js';
 import helpers from './helpers.js';
 import constants from './constants.js';
-import pickbank from './pickbank.js';
 
 var WIN_WIDTH = constants.WIN_WIDTH;
 var WIN_HEIGHT = constants.WIN_HEIGHT;
@@ -9,17 +7,6 @@ var thrmax = constants.thrmax;
 var tmodes = constants.tmodes;
 var degs = constants.degs;
 var degs2 = constants.degs2;
-
-var palupdate = globalstate.palupdate;
-var randpal = globalstate.randpal;
-var newonscreen = globalstate.newonscreen;
-var readkey = globalstate.readkey;
-var threads = globalstate.getThreads();
-var getWhichThread = globalstate.getWhichThread;
-var setWhichThread = globalstate.setWhichThread;
-var setForAllThreadsInBank = globalstate.setForAllThreadsInBank;
-var bank = globalstate.getBank();
-var getBankt = globalstate.getBankt;
 
 var createArray = helpers.createArray;
 var random1 = helpers.random1;
@@ -29,7 +16,9 @@ var bordupdate = helpers.bordupdate;
 var gridupdate = helpers.gridupdate;
 var wasakeypressed = helpers.wasakeypressed;
 
-export default function(ch) {
+export default function({
+	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads, ch
+}) {
 		console.log('---------- case_TYN happened');
 		var boolop = ch;
 		var _cleared = null;
@@ -68,7 +57,6 @@ export default function(ch) {
 					break;
 				case 'L':
 					bankmod(th, 'little');
-					//TODO: there is no example of this???
 					_cleared = true;
 					break;
 				case 'T':

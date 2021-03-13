@@ -32,20 +32,23 @@ export default function caseM() {
 		case 'A':
 		case 'N':
 			var othreads = getWhichThread();
-			if (ch == 'N') setWhichThread(0);
-
+			if (ch == 'N'){
+				setWhichThread(0);
+			}
 			do {
 				ch = readkey();
 				switch (ch) {
 					case '1': case '2': case '3':
 					case '4': case '5': case '6':
 					case '7': case '8': case '9':
-						threads[setWhichThread(getWhichThread()+1)-1].tmode 
+						setWhichThread(getWhichThread()+1)
+						threads[getWhichThread()-1].tmode 
 							= Number(ch);
 						break;
 					case 'R':
-						threads[setWhichThread(getWhichThread()+1)-1].tmode
-							= random1 (Number(tmodes)) + 1;
+						setWhichThread(getWhichThread()+1)
+						threads[getWhichThread()-1].tmode
+							= random1(Number(tmodes)) + 1;
 						break;
 				}
 			} while (!(ch == '16' || ch == '#' || getWhichThread() == thrmax));

@@ -83,11 +83,11 @@ var pickbank = function(){
 			case '4': case '5': case '6':
 			case '7': case '8': case '9':
 				console.warn(`pickbank numbers: ${ch}`)
-				bank = getBank();
+				const thisBank = getBank();
 				const bt = getBankt();
 				setBankt(bt+1);
-				bank[bt] = Number(ch);
-				setBank(bank);
+				thisBank[bt] = Number(ch);
+				setBank(thisBank);
 				if (bank[bt] > getWhichThread()){
 					setBankt(bt);
 				}
@@ -131,6 +131,7 @@ var pickbank = function(){
 				setBankt(getWhichThread());
 				break;
 			case 'E':
+				// every thread to bank
 				bank = getBank();
 				for (bankt = 1; bankt <= thrmax; bankt++){
 					bank[bankt - 1] = bankt;
@@ -139,7 +140,7 @@ var pickbank = function(){
 				setBankt(thrmax);
 				break;
 		}
-	} while (!(getBankt() >= getWhichThread() || ch === 'N' || ch === '0o15' || ch == '#'));
+	} while (!(getBankt() > getWhichThread() || ch === 'N' || ch === '0o15' || ch == '#'));
 	if (getBankt() == 0 && ch != 'N'){
 		setBankt(1);
 		bank = getBank();

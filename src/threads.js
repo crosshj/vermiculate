@@ -2,7 +2,7 @@ import globalstate from "./globalstate.js";
 import helpers from "./helpers.js";
 import constants from "./constants.js";
 
-const { getThreads, getErasing } = globalstate;
+const { getThreads, getErasing, gridden } = globalstate;
 const { wraparound, random1, atan2 } = helpers;
 const {
 	degs,
@@ -113,12 +113,12 @@ export function move(threadNumber, gfx) {
 				? 1 * degs4
 				: 3 * degs4
 			: dx > 0
-			? dy > 0
-				? 1 * degs8
-				: 7 * degs8
-			: dy > 0
-			? 3 * degs8
-			: 5 * degs8;
+				? dy > 0
+					? 1 * degs8
+					: 7 * degs8
+				: dy > 0
+				? 3 * degs8
+				: 5 * degs8;
 		if (desdeg - (desdeg % degs4) != LP.deg - (LP.deg % degs4) || LP.vhfollow) {
 			if (!LP.vhfollow) {
 				// Using atan2 here doesn't seem to slow things down:
@@ -160,8 +160,8 @@ export function move(threadNumber, gfx) {
 		let vertwall = false;
 		let horiwall = false;
 		if (oldcol == 1 && ((LP.killwalls && gridden > 0) || LP.realbounce)) {
-			vertwall = gp(xi, oldy) === 1;
-			horiwall = gp(oldx, yi) === 1;
+			vertwall = typeof gp(xi, oldy) !== 'undefined'
+			horiwall = typeof gp(oldx, yi) !== 'undefined';
 		}
 		if (oldcol == 1 && LP.realbounce && (vertwall || horiwall)) {
 			if (vertwall) LP.deg = -LP.deg + degs2;
@@ -221,6 +221,7 @@ export function move(threadNumber, gfx) {
 				LP.dead = false;
 			co = nextco;
 		} while (!(!LP.dead || co == LP.recpos));
+		LP.dead && console.log('thread died')
 	}
 	LP.recpos++;
 	LP.recpos = wraparound(LP.recpos, 0, LP.reclen);
