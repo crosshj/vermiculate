@@ -18,6 +18,7 @@ const {
 	thrmax,
 } = constants;
 const clone = x => JSON.parse(JSON.stringify(x));
+const oneToNine = [1,2,3,4,5,6,7,8,9].map(x => x+'');
 
 export default function({
 	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads
@@ -25,58 +26,56 @@ export default function({
 	pickbank();
 	var bankt = getBankt();
 	if (bankt <= 0) return;
+	const bank = getBank();
+	const threads = getThreads();
 
 	let ch = readkey();
 	switch (ch) {
 		case 'D':
+			// sets slice
 			ch = readkey();
-			switch (ch) {
-				case '1': case '2': case '3':
-				case '4': case '5': case '6':
-				case '7': case '8': case '9':
-					setForAllThreadsInBank(function(th){
-						th.slice = degs / (Number(ch));
-					});
-					break;
-				case 'M':
-					setForAllThreadsInBank(function(th){
-						th.slice = 0;
-					});
-					break;
+			if(oneToNine.includes(ch)){
+				setForAllThreadsInBank((th) => {
+					th.slice = degs / (Number(ch));
+				});
+			};
+			if(ch === 'M'){
+				setForAllThreadsInBank((th) => { th.slice = 0; });
 			}
 			break;
-		case 'S': {
-			setForAllThreadsInBank(function(th){
+		case 'S':
+			// sets tslen, turnseq, tclim, tsc
+			setForAllThreadsInBank((th) => {
 				th.otslen = th.tslen;
 				th.tslen = 0;
 			});
-			const bank=getBank();
-			const threads=getThreads();
-			do {
-				var oldch = ch+"";
+			const doLoop = () => {
+				const oldch = ch+"";
 				ch = readkey();
-				setForAllThreadsInBank(function(th, bankc){
-						switch (ch) {
-						case '1': case '2': case '3':
-						case '4': case '5': case '6':
-						case '7': case '8': case '9':
-							th.tslen++;
-							th.turnseq[th.tslen - 1] = Number(ch);
-							if (oldch == '-'){
-								th.turnseq[th.tslen - 1] *= -1;
-							}
-							if (bankc % 2 == 0){
-								th.turnseq[th.tslen - 1] *= -1;
-							}
-							break;
+
+				if(typeof ch === 'undefined' || ch === '#'){
+					return false;
+				}
+				if(!oneToNine.includes(ch)) return true;
+
+				setForAllThreadsInBank((th, bankc) => {
+					th.tslen++;
+					th.turnseq[th.tslen - 1] = Number(ch);
+					if (oldch == '-'){
+						th.turnseq[th.tslen - 1] *= -1;
+					}
+					if (bankc % 2 == 0){
+						th.turnseq[th.tslen - 1] *= -1;
 					}
 				});
-			} while (!(ch == '16' || ch == '#' || threads[bank[0] - 1].tslen == 50));
-			// c = '\15' is Shift In, js = 16
-
-			setForAllThreadsInBank(function(th){
+				// c = '\15' is Shift In, js = 16
+				return !(
+					ch == '16' ||threads[bank[0] - 1].tslen === 50
+				);
+			}
+			loop(doLoop);
+			setForAllThreadsInBank((th) => {
 				var seqSum = 0;
-
 				if (th.tslen === 0){
 					th.tslen = th.otslen;
 				}
@@ -85,13 +84,12 @@ export default function({
 				}
 				if (seqSum == 0){
 					th.tclim = 1;
-				} else {
-					th.tclim = Math.floor(degs2 / Math.abs(seqSum));
-					th.tsc = random1(th.tslen) + 1;
+					return;
 				}
+				th.tclim = Math.floor(degs2 / Math.abs(seqSum));
+				th.tsc = random1(th.tslen) + 1;
 			});
 			break;
-		}
 		case 'T':
 			ch = readkey();
 			setForAllThreadsInBank(function(th){
@@ -114,11 +112,9 @@ export default function({
 			});
 			break;
 		case 'F':
-			const bank=getBank();
 			const fbank = clone(bank);
 			const fbankt = bankt;
 			ch = pickbank();
-			const threads = getThreads();
 			for (var bankc = 1; bankc <= fbankt; bankc++) {
 				var L = threads[fbank[bankc - 1] - 1];
 				if (ch == 'N'){
@@ -151,7 +147,5 @@ export default function({
 			});
 			break;
 	}
-
-	console.log('---------- case_C EXIT');
 }
 

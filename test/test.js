@@ -13,6 +13,36 @@ const readkeyMock = k => k.shift.bind(k);
 const pickbankMock = (readkey, exitOn) => () => {
 	while( ![exitOn, '#', 'N', undefined].includes(readkey()) ){}
 };
+const setupTest = (inputString) => {
+	const state = {
+		whichThread: 0,
+		threads: new Array(constants.thrmax)
+			.fill()
+			.map(x =>({})),
+	};
+	const readkey = readkeyMock(inputString.toUpperCase().split(''));
+	const args = {
+		readkey,
+
+		setForAllThreadsInBank: (fn) => state.bank.forEach((b,i) => {
+			return fn(state.threads[b-1], i+1);
+		}),
+		pickbank: pickbankMock(readkey, 'E'),
+
+		getBankt: () => state.bankt,
+		setBankt: () => state.bankt,
+
+		getBank: () => state.bank,
+		setBank: (bank) => (state.bank = bank),
+
+		getWhichThread: () => state.whichThread,
+		setWhichThread: (which) =>  (state.whichThread = which),
+		
+		getThreads: () => state.threads,
+		setThreads: (threads) => state.threads = threads,
+	};
+	return { state, args };
+};
 
 /*
 	+ prey behavior
@@ -26,38 +56,110 @@ const pickbankMock = (readkey, exitOn) => () => {
 	7) rounded 4-point star | clover
 */
 
-describe('initstring: Overall', ({ before }) => {
-	before(() => {
-		//console.log(sampleStrings)
-	})
-	it.todo('should parse init string without side effects, ie. no dependency injection');
-	it.todo('should connect with app in way that allows decoupling');
-	it.todo('should connect and code all missing cases');
-})
+describe('initstring: all cases included', () => {
+	it.todo('should parse all sample strings without missing cases');
+});
 
-describe('initstring: Case C', () => {
-	it.todo('should figure out what this is really for and clarify');
+describe('initstring: Case C (change threads?)', () => {
+	it('should only change pickbank threads', () => {
+		const { state, args } = setupTest('c123#d1');
+		state.bank = [1,3];
+		state.bankt = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+		const otherThreads = state.threads.filter((x,i) => !state.bank.includes(i+1));
 
-	it.todo('should handle: CD{numbers}', ({ assert}) => {
-		// caseC should be called with mocked versions of these
-		// pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads
+		const firstRead = args.readkey();
+		caseC({ ch: firstRead, ...args });
+
+		expect(
+			bankThreads.every(th => typeof th.slice !== 'undefined')
+		).toEqual(true);
+		expect(
+			otherThreads.every(th => typeof th.slice === 'undefined')
+		).toEqual(true);
 	});
-	it.todo('should handle: CDM');
 
-	it.todo('should handle: CS{numbers}#');
+	it('should set slice with number', () => {
+		const { state, args } = setupTest('c123#d1');
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
 
-	it.todo('should handle: CT{numbers}');
-	it.todo('should handle: CTR');
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
 
-	it('should handle: CO{any character}', () => {
+		expect(bankThreads.every(x => x.slice === 360)).toEqual(true);
+	});
+	it('should set slice to zero', ()=>{
+		const { state, args } = setupTest('c123#dm');
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
+
+		expect(bankThreads.every(x => x.slice === 0)).toEqual(true);
+	});
+
+	it('should set turn props with numbers', () => {
+		// sets tslen, turnseq, tclim, tsc
+		const { state, args } = setupTest('c123#s123#');
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+		bankThreads.forEach(th => { th.turnseq = [] });
+
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
+
+		expect(bankThreads.every((x,i) => {
+			const signsAreCorrect = i % 2 === 0
+				? (x.turnseq[1] > 0 && x.turnseq[2] > 0)
+				: (x.turnseq[1] < 0 && x.turnseq[2] < 0)
+			const tslenCorrect = typeof x.tslen !== undefined && x.tslen === 3;
+			return typeof x.turnseq !== undefined &&
+				x.turnseq.length === 3 &&
+				tslenCorrect &&
+				typeof x.tclim !== undefined &&
+				typeof x.tsc !== undefined &&
+				signsAreCorrect;
+		})).toEqual(true);
+	});
+	it('should set turn props with minus', () => {
+		// sets tslen, turnseq, tclim, tsc
+		const { state, args } = setupTest('c123#s12-3#');
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+		bankThreads.forEach(th => { th.turnseq = [] });
+
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
+
+		expect(bankThreads.every((x,i) => {
+			const signsAreCorrect = i % 2 === 0
+				? (x.turnseq[1] > 0 && x.turnseq[2] < 0)
+				: (x.turnseq[1] < 0 && x.turnseq[2] > 0)
+			const tslenCorrect = typeof x.tslen !== undefined && x.tslen === 3;
+			return typeof x.turnseq !== undefined &&
+				x.turnseq.length === 3 &&
+				tslenCorrect &&
+				typeof x.tclim !== undefined &&
+				typeof x.tsc !== undefined &&
+				signsAreCorrect;
+		})).toEqual(true);
+	});
+
+	it('should set orichar', () => {
 		const charToSet = 'X';
 		const arbitraryBankNumber = 9;
 		const threads = [{}, {}];
 		const args = {
 			readkey: readkeyMock(['O', charToSet]),
 			setForAllThreadsInBank: fn => threads.forEach(fn),
-			// warning, real pickbank calls readkey
 			pickbank: new Mock(),
+			getBank: new Mock(),
 			getBankt: new Mock().returns(arbitraryBankNumber),
 			getThreads: new Mock().returns(threads),
 		};
@@ -69,10 +171,7 @@ describe('initstring: Case C', () => {
 		expect(threads.every(x => x.orichar === charToSet)).toEqual(true);
 	});
 
-	it.todo('should handle: CF{numbers only?}');
-	it.todo('should handle: CFN');
-
-	it('should handle: C{numbers-pound}L', () => {
+	it('should set prey (leader?)', () => {
 		//NOTE: in this case, a bank of threads is set with prey (lead?)
 		const inputString = 'c1234#l'.toUpperCase();
 		const state = {
@@ -94,37 +193,23 @@ describe('initstring: Case C', () => {
 
 		const firstRead = args.readkey();
 		caseC(args);
-		
-		logJSON(state)
 
 		expect(firstRead).toEqual('C');
 		expect(state.threads.every(x => Number.isInteger(x.prey))).toEqual(true);
 		expect(state.threads.map(x=>x.prey).join('')).toEqual('2341')
 	});
 
+	it.todo('should handle: CF{numbers only?}');
+	it.todo('should handle: CFN');
+
+	it.todo('should handle: CT{numbers}');
+	it.todo('should handle: CTR');
+	
 	it.todo('should handle: CRR');
 	it.todo('should handle: CR{numbers}');
 });
 
 describe('initstring: Case M (set threads mode)', () => {
-	const setupTest = (inputString) => {
-		const state = {
-			whichThread: 0,
-			threads: new Array(constants.thrmax)
-				.fill()
-				.map(x =>({})),
-		};
-		const readkey = readkeyMock(inputString.toUpperCase().split(''));
-		const args = {
-			readkey, 
-			getWhichThread: () => state.whichThread,
-			setWhichThread: (which) =>  state.whichThread = which,
-			getThreads: () => state.threads,
-			setThreads: (threads) => state.threads = threads,
-		};
-		return { state, args };
-	};
-
 	it('should handle: MA{numbers}#', () => {
 		const { state, args } = setupTest('ma123#');
 		state.whichThread = 4;
@@ -212,7 +297,7 @@ describe('initstring: Case TYN (change thread properties)', () => {
 		return { state, args };
 	};
 
-	it('should change only the threads that pickbank selects', () => {
+	it('should only change pickbank threads', () => {
 		const { state, args } = setupTest('tes');
 		state.bank = [1,4];
 
