@@ -3,6 +3,7 @@ import { describe, it, Mock, expect } from './framework.js';
 
 import constants from '../src/constants.js';
 import caseC from '../src/caseC.js';
+import caseM from '../src/caseM.js';
 import caseTYN from '../src/caseTYN.js';
 
 const { sampleStrings } = constants;
@@ -105,14 +106,72 @@ describe('initstring: Case C', () => {
 	it.todo('should handle: CR{numbers}');
 });
 
-describe('initstring: Case M', () => {
-	it.todo('should figure out what this is really for and clarify');
+describe('initstring: Case M (set threads mode)', () => {
+	const setupTest = (inputString) => {
+		const state = {
+			whichThread: 0,
+			threads: new Array(constants.thrmax)
+				.fill()
+				.map(x =>({})),
+		};
+		const readkey = readkeyMock(inputString.toUpperCase().split(''));
+		const args = {
+			readkey, 
+			getWhichThread: () => state.whichThread,
+			setWhichThread: (which) =>  state.whichThread = which,
+			getThreads: () => state.threads,
+			setThreads: (threads) => state.threads = threads,
+		};
+		return { state, args };
+	};
 
-	it.todo('should handle: MA{numbers}#');
-	it.todo('should handle: MAR#');
+	it('should handle: MA{numbers}#', () => {
+		const { state, args } = setupTest('ma123#');
+		state.whichThread = 4;
+		const firstRead = args.readkey();
+		const ch = caseM({ ch: firstRead, ...args });
 
-	it.todo('should handle: MN{numbers}#');
-	it.todo('should handle: MNR#');
+		expect(true).toEqual(true);
+		expect(state.threads[4].tmode).toEqual(1);
+		expect(state.threads[5].tmode).toEqual(2);
+		expect(state.threads[6].tmode).toEqual(3);
+		expect(state.whichThread).toEqual(7);
+	});
+	it('should handle: MAR#',() => {
+		const { state, args } = setupTest('mar#');
+		state.whichThread = 4;
+		const firstRead = args.readkey();
+		const ch = caseM({ ch: firstRead, ...args });
+
+		expect(true).toEqual(true);
+		expect(typeof state.threads[state.whichThread-1].tmode).toEqual('number');
+		expect(
+			[1,2,3,4,5,6,7].includes(state.threads[state.whichThread-1].tmode)
+		).toEqual(true);
+	});
+
+	it('should handle: MN{numbers}#', () => {
+	const { state, args } = setupTest('mn123#');
+		state.whichThread = 4;
+		const firstRead = args.readkey();
+		const ch = caseM({ ch: firstRead, ...args });
+
+		expect(true).toEqual(true);
+		expect(state.threads[0].tmode).toEqual(1);
+		expect(state.threads[1].tmode).toEqual(2);
+		expect(state.threads[2].tmode).toEqual(3);
+	});
+	it('should handle: MNR#', () => {
+	const { state, args } = setupTest('mnrrr#');
+		state.whichThread = 4;
+		const firstRead = args.readkey();
+		const ch = caseM({ ch: firstRead, ...args });
+
+		expect(true).toEqual(true);
+		expect(typeof state.threads[0].tmode).toEqual('number');
+		expect(typeof state.threads[1].tmode).toEqual('number');
+		expect(typeof state.threads[2].tmode).toEqual('number');
+	});
 });
 
 describe('initstring: Case Others', () => {

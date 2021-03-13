@@ -19,14 +19,14 @@ var wasakeypressed = helpers.wasakeypressed;
 export default function({
 	pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads, ch
 }) {
-		console.log('---------- case_TYN happened');
+		//console.log('---------- case_TYN happened');
 		var boolop = ch;
 		var _cleared = null;
 		pickbank();
 
 		var bankt = getBankt();
 		if(bankt <= 0){
-			console.log('---------- case_TYN EXIT');
+			//console.log('---------- case_TYN EXIT');
 			return { cleared: _cleared };
 		}
 
@@ -68,6 +68,6 @@ export default function({
 			}
 		});
 
-		console.log('---------- case_TYN EXIT');
+		//console.log('---------- case_TYN EXIT');
 		return { cleared: _cleared };
 }

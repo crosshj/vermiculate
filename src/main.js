@@ -81,9 +81,7 @@ const keyPressHandler = ({ cleared, halted }) => {
 		const ch = wasakeypressed() && readkey();
 		if(!ch) return false;
 		const caseHandler = mainMap[ch] || unknownCase(ch);
-		const res = caseHandler({
-			pickbank, getBank, getBankt, readkey, setForAllThreadsInBank, getThreads, setThreads, ch
-		}) || {};
+		const res = caseHandler({...globalstate, pickbank, ch }) || {};
 		if(typeof res.halted !== 'undefined') _halted = res.halted;
 		if(typeof res.cleared !== 'undefined') _cleared = res.cleared;
 		return true; //loop
@@ -164,8 +162,6 @@ export default async function main({ throttle=8, seed }={}) {
 		await asyncLoop(insideLoop);
 		return !halted;
 	};
-
-
 
 	await asyncLoop(outsideLoop);
 }

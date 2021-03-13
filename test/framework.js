@@ -108,7 +108,7 @@ const runTests = debounce(() => {
 	_QUnit.start();
 }, debounceTimeout);
 
-
+//TODO: these should follow the same debounce pattern as above
 export const describe = (desc, test) => {
 	suites.push({ desc, test });
 	runTests();

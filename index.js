@@ -25,7 +25,7 @@ document.body.style.overflow = "hidden";
 document.head.innerHTML += `<link rel="stylesheet" href="index.css">`
 
 //const CURRENT_CONFIG = 5; //some problems with this * pickbank
-const CURRENT_CONFIG = 7;
+const CURRENT_CONFIG = 17;
 window.process = { argv: [,,CURRENT_CONFIG] };
 
 main({
