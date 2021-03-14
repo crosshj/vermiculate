@@ -1,17 +1,24 @@
 //show-preview
+/*
+https://github.com/fnatter/ball2d/blob/647a7c43e0fb8bc4ede52ee070154dfa357428de/xscreensaver-5.35/hacks/vermiculate.c
+*/
 import { describe, it, Mock, expect } from './framework.js';
 
 import constants from '../src/constants.js';
 import caseC from '../src/caseC.js';
 import caseM from '../src/caseM.js';
+import {
+	caseR
+} from '../src/caseOthers.js';
 import caseTYN from '../src/caseTYN.js';
-
 const { sampleStrings } = constants;
-const logJSON = x => console.log(JSON.stringify(x,null,2))
 
+const logJSON = x => console.log(JSON.stringify(x,null,2))
 const readkeyMock = k => k.shift.bind(k);
 const pickbankMock = (readkey, exitOn) => () => {
-	while( ![exitOn, '#', 'N', undefined].includes(readkey()) ){}
+	while(
+		![exitOn, '#', 'N', undefined].includes(readkey())
+	){}
 };
 const setupTest = (inputString) => {
 	const state = {
@@ -259,9 +266,21 @@ describe('initstring: Case M (set threads mode)', () => {
 	});
 });
 
-describe('initstring: Case Others', () => {
+describe.only('initstring: Case Others', () => {
 	it.todo('should figure out what Case R really for and clarify');
-	it.todo('should handle: R');
+	it('should handle: R', () => {
+		const args = {
+			getBordCol: new Mock().returns(1),
+			setBordCol: new Mock(),
+			getBordCorn: new Mock(),
+			setBordCorn: new Mock(),
+			bordupdate: new Mock()
+		};
+
+		caseR(args);
+
+		expect(true).toEqual(true);
+	});
 	
 	it.todo('should handle: {numbers}');
 	
@@ -276,7 +295,7 @@ describe('initstring: Case Others', () => {
 	it.todo('should handle: [');
 });
 
-describe('initstring: Case TYN (change thread properties)', () => {
+describe('initstring: Case TYN (boolean properties)', () => {
 	const setupTest = (inputString) => {
 		const state = {
 			bankt: 4,

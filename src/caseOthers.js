@@ -6,8 +6,6 @@ const {
 	palupdate, randpal,
 	newonscreen, getThreads, setThreads, getWhichThread, setWhichThread,
 	wasakeypressed, readkey,
-	getBordCol, setBordCol,
-	getBordCorn, setBordCorn,
 	getErasing, setErasing,
 	getSpeed
 } = globalstate;
@@ -18,7 +16,11 @@ const {
 	bordupdate, gridupdate, sleep
 } = helpers;
 
-export const caseR = () => {
+export const caseR = ({
+	getBordCol, setBordCol,
+	getBordCorn, setBordCorn,
+	bordupdate
+}) => {
 	if (getBordCol() !== 1) return;
 	setBordCol(0);
 	bordupdate();
