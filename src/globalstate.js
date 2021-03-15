@@ -296,6 +296,7 @@ export default {
 	setBordCol: setBordCol,
 	getBordCorn: getBordCorn,
 	setBordCorn: setBordCorn,
+	bordupdate: () => {}, //TODO: bleh, border stuff
 
 	getErasing: getErasing,
 	setErasing: setErasing,

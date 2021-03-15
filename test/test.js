@@ -8,21 +8,30 @@ import constants from '../src/constants.js';
 import caseC from '../src/caseC.js';
 import caseM from '../src/caseM.js';
 import {
-	caseR
+	caseR, caseEscape, caseSpace
 } from '../src/caseOthers.js';
 import caseTYN from '../src/caseTYN.js';
 const { sampleStrings } = constants;
 
 const logJSON = x => console.log(JSON.stringify(x,null,2))
 const readkeyMock = k => k.shift.bind(k);
-const pickbankMock = (readkey, exitOn) => () => {
-	while(
-		![exitOn, '#', 'N', undefined].includes(readkey())
-	){}
+const pickbankMock = (readkey, exitOn, state) => () => {
+	if(state){
+		state.bank = [];
+	}
+	let ch;
+	while(true){
+		ch = readkey();
+		if([exitOn, '#', 'N', undefined].includes(ch)) break;
+		state && (state.bank.push(ch));
+		state && (state.bankt = ch);
+	}
+	return ch;
 };
 const setupTest = (inputString) => {
 	const state = {
 		whichThread: 0,
+		bank: [],
 		threads: new Array(constants.thrmax)
 			.fill()
 			.map(x =>({})),
@@ -51,23 +60,11 @@ const setupTest = (inputString) => {
 	return { state, args };
 };
 
-/*
-	+ prey behavior
-	0) not active?
-	1) straight w/ slight wiggle
-	2) zig-zag triangles
-	3) circular
-	4) swirly | ornate
-	5) wiggle | sinusoidal
-	6) oblong | stone-shaped
-	7) rounded 4-point star | clover
-*/
-
 describe('initstring: all cases included', () => {
 	it.todo('should parse all sample strings without missing cases');
 });
 
-describe('initstring: Case C (change threads?)', () => {
+describe.only('initstring: Case C (change threads?)', () => {
 	it('should only change pickbank threads', () => {
 		const { state, args } = setupTest('c123#d1');
 		state.bank = [1,3];
@@ -206,8 +203,55 @@ describe('initstring: Case C (change threads?)', () => {
 		expect(state.threads.map(x=>x.prey).join('')).toEqual('2341')
 	});
 
-	it.todo('should handle: CF{numbers only?}');
-	it.todo('should handle: CFN');
+	it('should handle: C{pickbank-pound}F{pickbank-#}', () => {
+		const { state, args } = setupTest('c123#f456#');
+		args.pickbank = pickbankMock(args.readkey, null, state);
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		state.whichThread = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
+
+		bankThreads.forEach((th, i) => {
+			expect(th.prey).toEqual(i+4);
+		});
+	});
+	it('should handle: C{pickbank-#}F{pickbank-#} (last leader)', () => {
+		const { state, args } = setupTest('c123456#f12#');
+		args.pickbank = pickbankMock(args.readkey, null, state);
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		state.whichThread = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
+
+		bankThreads.forEach((th, i) => {
+			if(i >= 2){
+				expect(th.prey).toEqual(2);
+				return;
+			}
+			expect(th.prey).toEqual(i+1);
+		});
+	});
+	it('should handle: C{pickbank-pound}F{pickbank-N}', () => {
+		const { state, args } = setupTest('c123#fn');
+		args.pickbank = pickbankMock(args.readkey, null, state);
+		state.bank = [1,2,3];
+		state.bankt = 3;
+		state.whichThread = 3;
+		const bankThreads = state.bank.map(x => state.threads[x-1]);
+
+		const firstRead = args.readkey();
+		const ch = caseC({ ch: firstRead, ...args });
+
+		bankThreads.forEach((th, i) => {
+			expect(th.prey).toEqual(0);
+		});
+	});
 
 	it.todo('should handle: CT{numbers}');
 	it.todo('should handle: CTR');
@@ -223,7 +267,6 @@ describe('initstring: Case M (set threads mode)', () => {
 		const firstRead = args.readkey();
 		const ch = caseM({ ch: firstRead, ...args });
 
-		expect(true).toEqual(true);
 		expect(state.threads[4].tmode).toEqual(1);
 		expect(state.threads[5].tmode).toEqual(2);
 		expect(state.threads[6].tmode).toEqual(3);
@@ -235,7 +278,6 @@ describe('initstring: Case M (set threads mode)', () => {
 		const firstRead = args.readkey();
 		const ch = caseM({ ch: firstRead, ...args });
 
-		expect(true).toEqual(true);
 		expect(typeof state.threads[state.whichThread-1].tmode).toEqual('number');
 		expect(
 			[1,2,3,4,5,6,7].includes(state.threads[state.whichThread-1].tmode)
@@ -248,7 +290,6 @@ describe('initstring: Case M (set threads mode)', () => {
 		const firstRead = args.readkey();
 		const ch = caseM({ ch: firstRead, ...args });
 
-		expect(true).toEqual(true);
 		expect(state.threads[0].tmode).toEqual(1);
 		expect(state.threads[1].tmode).toEqual(2);
 		expect(state.threads[2].tmode).toEqual(3);
@@ -259,16 +300,32 @@ describe('initstring: Case M (set threads mode)', () => {
 		const firstRead = args.readkey();
 		const ch = caseM({ ch: firstRead, ...args });
 
-		expect(true).toEqual(true);
 		expect(typeof state.threads[0].tmode).toEqual('number');
 		expect(typeof state.threads[1].tmode).toEqual('number');
 		expect(typeof state.threads[2].tmode).toEqual('number');
 	});
 });
 
-describe.only('initstring: Case Others', () => {
-	it.todo('should figure out what Case R really for and clarify');
-	it('should handle: R', () => {
+describe('initstring: Case Others', () => {
+	it('should not reset border when bordercol !== 1', () => {
+		const args = {
+			getBordCol: new Mock().returns(0),
+			setBordCol: new Mock(),
+			getBordCorn: new Mock(),
+			setBordCorn: new Mock(),
+			bordupdate: new Mock()
+		};
+
+		caseR(args);
+
+		expect(args.getBordCol.wasCalled).toEqual(true);
+		expect(args.setBordCol.wasCalled).toEqual(false);
+		expect(args.getBordCorn.wasCalled).toEqual(false);
+		expect(args.setBordCorn.wasCalled).toEqual(false);
+		expect(args.bordupdate.wasCalled).toEqual(false);
+	});
+	
+	it('should reset border attributes', () => {
 		const args = {
 			getBordCol: new Mock().returns(1),
 			setBordCol: new Mock(),
@@ -279,17 +336,27 @@ describe.only('initstring: Case Others', () => {
 
 		caseR(args);
 
-		expect(true).toEqual(true);
+		expect(args.getBordCol.wasCalled).toEqual(true);
+		expect(args.setBordCol.wasCalled).toEqual(true);
+		expect(args.getBordCorn.wasCalled).toEqual(true);
+		expect(args.setBordCorn.wasCalled).toEqual(true);
+		expect(args.bordupdate.wasCalled).toEqual(true);
 	});
-	
+
+	it('should handle: escape', () => {
+		const { halted, cleared } = caseEscape() || {};
+		expect(typeof cleared).toEqual('undefined');
+		expect(halted).toEqual(true);
+	});
+	it('should handle: space', () => {
+		const { halted, cleared } = caseSpace() || {};
+		expect(typeof halted).toEqual('undefined');
+		expect(cleared).toEqual(true);
+	});
+
 	it.todo('should handle: {numbers}');
-	
-	it.todo('should handle: escape');
-	it.todo('should handle: space');
 
 	it.todo('should handle: E');
-	
-	it.todo('should handle unkown cases');
 
 	it.todo('should handle: ]');
 	it.todo('should handle: [');
@@ -530,7 +597,6 @@ describe('initstring: Case TYN (boolean properties)', () => {
 });
 
 describe('initstring: pickbank', () => {
-	it.todo('should figure out what this is really for and clarify');
 	it.todo('should handle: +');
 	it.todo('should handle: -');
 	it.todo('should handle: space');
@@ -542,5 +608,27 @@ describe('initstring: pickbank', () => {
 
 	it.todo('should handle: A');
 	it.todo('should handle: E');
+});
+
+describe('threads: move', () => {
+	/*
+		+ prey behavior
+		0) not active?
+		1) straight w/ slight wiggle
+		2) zig-zag triangles
+		3) circular
+		4) swirly | ornate
+		5) wiggle | sinusoidal
+		6) oblong | stone-shaped
+		7) rounded 4-point star | clover
+	*/
+	it.todo('move when prey is set');
+	it.todo('move when mode is 1: straight');
+	it.todo('move when mode is 2: zig-zag');
+	it.todo('move when mode is 3: circular');
+	it.todo('move when mode is 4: swirly');
+	it.todo('move when mode is 5: sinusoidal');
+	it.todo('move when mode is 6: rounded oblong');
+	it.todo('move when mode is 7: clover');
 });
 

@@ -112,17 +112,18 @@ export default function({
 			});
 			break;
 		case 'F':
-			const fbank = clone(bank);
-			const fbankt = bankt;
+			const followerbank = clone(bank);
 			ch = pickbank();
-			for (var bankc = 1; bankc <= fbankt; bankc++) {
-				var L = threads[fbank[bankc - 1] - 1];
-				if (ch == 'N'){
-					L.prey = 0;
-				} else {
-					L.prey = bank[0 + (bankc - 1) % bankt];
-				}
-			}
+			const leaderbank = getBank();
+			let lastLeader;
+			followerbank.forEach((b, i) => {
+				if(typeof b === 'undefined' || b === null) return;
+				lastLeader = leaderbank[i] || lastLeader;
+				var L = threads[b - 1];
+				L.prey = ch == 'N'
+					? 0
+					: Number(lastLeader);
+			});
 			setThreads(threads);
 			break;
 		case 'L': {
