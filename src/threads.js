@@ -5,16 +5,7 @@ import constants from "./constants.js";
 const { getThreads, getErasing, gridden } = globalstate;
 const { wraparound, random1, atan2 } = helpers;
 const {
-	degs,
-	degs2,
-	degs4,
-	degs8,
-	dtor,
-	cosof,
-	sinof,
-	tanof,
-	curviness,
-	thrmax,
+	degs, degs2, degs4, degs8, dtor, cosof, sinof, tanof, curviness, thrmax,
 } = constants;
 
 const abs = Math.abs;
