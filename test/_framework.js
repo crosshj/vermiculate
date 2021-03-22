@@ -1,6 +1,8 @@
 import _QUnit from 'https://cdn.skypack.dev/@dev.mohe/qunit';
 //import QUnit from 'https://cdn.skypack.dev/qunit';
-document.head.innerHTML += `<link rel="stylesheet" href="test.css">`
+document.head.innerHTML += `<link rel="stylesheet" href="_test.css">`
+
+export const logJSON = x => console.log(JSON.stringify(x,null,2))
 
 _QUnit.config.autostart = false;
 //QUnit.start()
@@ -123,7 +125,13 @@ describe.only = (desc, test) => {
 };
 
 
-export const it = _QUnit.test.bind(QUnit);
+export const it = (desc, cb) => {
+	if(!cb) return _QUnit.test.bind(QUnit)(desc, () => {})
+	_QUnit.test.bind(QUnit)( desc, () => {
+		cb();
+		expect(true).toEqual(true)
+	});
+}
 it.todo = (desc, cb) => _QUnit.todo(desc, cb || (() => {}));
 it.skip = _QUnit.skip;
 it.only = _QUnit.only;

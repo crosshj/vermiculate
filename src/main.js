@@ -48,7 +48,7 @@ const mainMap = {
 	mainMap[x] = caseTYN;
 });
 [1,2,3,4,5,6,7,8,9].forEach(x => {
-	mainMap[x] = caseNumbers(x);
+	mainMap[x] = caseNumbers;
 });
 
 /*
@@ -73,7 +73,7 @@ case '[':
 	break;
 */
 
-const keyPressHandler = ({ cleared, halted }) => {
+const keyPressHandler = ({ cleared, halted, gfx }) => {
 	let _halted = halted;
 	let _cleared = cleared;
 
@@ -81,7 +81,7 @@ const keyPressHandler = ({ cleared, halted }) => {
 		const ch = wasakeypressed() && readkey();
 		if(!ch) return false;
 		const caseHandler = mainMap[ch] || unknownCase(ch);
-		const res = caseHandler({...globalstate, pickbank, ch }) || {};
+		const res = caseHandler({...globalstate, pickbank, ch, ...gfx }) || {};
 		if(typeof res.halted !== 'undefined') _halted = res.halted;
 		if(typeof res.cleared !== 'undefined') _cleared = res.cleared;
 		return true; //loop
@@ -133,7 +133,7 @@ export default async function main({ throttle=8, seed }={}) {
 	let iteration = 0;
 
 	const insideLoop = async () => {
-		({ cleared, halted } = keyPressHandler({ cleared, halted }));
+		({ cleared, halted } = keyPressHandler({ cleared, halted, gfx }));
 		let alltrapped = true;
 		if(iteration++ === speed){
 			iteration = 0;

@@ -45,7 +45,6 @@ function getRGB(){ return RGB; }
 
 var threads = createObjectsArray(thrmax);
 function setThreads(th){ 
-	console.log('----------------- SET THREADS');
 	threads = th;
 	return threads; 
 }
@@ -57,7 +56,6 @@ function setForAllThreadsInBank(mutator){
 	return bankThreads;
 }
 function getThreads(number){ 
-	//console.log('----------------- GET THREADS');
 	return typeof number === 'undefined'
 		? threads
 		: threads[number];
@@ -65,67 +63,53 @@ function getThreads(number){
 
 var whichThread = 0;
 function setWhichThread(th){ 
-	console.log('----------------- SET WHICH THREAD: ' + th);
 	whichThread = th;
 	return whichThread; 
 }
 function getWhichThread(){ 
-	//console.log('----------------- GET WHICH THREAD: ' + whichThread);
 	return whichThread; 
 }
 
 var bank = new Array(thrmax);
 function setBank(ba){ 
-	console.log('----------------- SET BANK');
 	bank = ba;
 	return bank; 
 }
-function getBank(){ 
-	console.log('----------------- GET BANK');
-	return bank; 
-}
+function getBank(){ return bank; }
 
 var bankt = 0;
 function setBankt(bt){ 
-	console.log('----------------- SET BANK(T): ' + bt);
 	bankt = bt;
 	return bankt; 
 }
 function getBankt(){ 
-	console.log('----------------- GET BANK(T): ' + bankt);
 	return bankt; 
 }
 
 var bordcol = 1;
 function setBordCol(bc){ 
-	console.log('----------------- SET BORDCOL: ' + bc);
 	bordcol = bc;
 	return bordcol; 
 }
 function getBordCol (){
-	console.log('----------------- GET BORDCOL: ' + bordcol);
 	return bordcol;
 }
 
 var bordcorn = 0;
 function setBordCorn(bc){ 
-	console.log('----------------- SET BORDCORN: ' + bc);
 	bordcorn = bc;
 	return bordcorn; 
 }
 function getBordCorn (){
-	console.log('----------------- GET BORDCORN: ' + bordcorn);
 	return bordcorn;
 }
 
 var erasing = true;
 function setErasing(er){ 
-	//console.log('----------------- SET ERASING: ' + er);
 	erasing = er;
 	return erasing; 
 }
 function getErasing (){
-	//console.log('----------------- GET ERASING: ' + erasing);
 	return erasing;
 }
 
@@ -255,13 +239,11 @@ function readkey() {
 			readkey_result = instring[instringPos];
 			instringPos++;
 		};
-		console.log("\t\t\t\t\t\t\treadkey: ", readkey_result)
 		return readkey_result.toUpperCase();
 }
 
 function wasakeypressed() {
 	var instringRemainder = (instring||"").substring(instringPos||"");
-	instringRemainder && console.log("\t"+instringRemainder)
 	return instringRemainder.length > 0;
 }
 

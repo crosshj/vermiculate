@@ -30,14 +30,12 @@ export const caseR = ({
 	return;
 };
 
-export const caseNumbers = (ch) => () => {
-	console.log('---------- case_NUMBERS happened');
+export const caseNumbers = ({ ch, getThreads, setThreads }) => {
 	const threads = getThreads();
 	for (var c = 1; c <= thrmax; c++) {
 		threads[c - 1].tmode = Number(ch);
 	}
 	setThreads(threads);
-	console.log('---------- case_NUMBERS EXIT');
 };
 
 export const caseEscape = () => ({ halted: true });
@@ -52,12 +50,31 @@ export const unknownCase = (ch) => () => {
 	console.log(`----- DON'T KNOW ABOUT THIS CASE [ ${ch} ] ----`)
 };
 
-export const caseAddThread = () => {
+// ]
+export const caseAddThread = ({ getWhichThread, newonscreen, setWhichThread }) => {
 	const lastThreadNumber = getWhichThread();
 	if (lastThreadNumber >= thrmax) return;
 	newonscreen(lastThreadNumber+1);
 	setWhichThread(lastThreadNumber+1);
 };
+
+// [
+export const caseRemoveThread = ({ getWhichThread, setWhichThread, getThreads, sp }) => {
+	const whichThread = getWhichThread();
+	const threads = getThreads();
+	if(whichThread <= 1) return;
+	const L = threads[whichThread - 1];
+	const lastpos = L.filled
+		? L.reclen -1
+		: L.recpos;
+	for(let c=0; c <= lastpos; c++){
+		sp(L.xrec[c], L.yrec[c], 0);
+		setWhichThread(whichThread - 1);
+		// maybe should also remove thread itself?
+	}
+}
+
+export const caseE = ({ getErasing, setErasing }) => setErasing(!getErasing());
 
 export const caseBorder = () => {
 	// don't really care about borders?

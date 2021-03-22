@@ -16,6 +16,7 @@ const {
 	tanof,
 	curviness,
 	thrmax,
+	tmodes
 } = constants;
 const clone = x => JSON.parse(JSON.stringify(x));
 const oneToNine = [1,2,3,4,5,6,7,8,9].map(x => x+'');
@@ -92,18 +93,16 @@ export default function({
 			break;
 		case 'T':
 			ch = readkey();
-			setForAllThreadsInBank(function(th){
-				switch (ch) {
-					case '1': case '2': case '3':
-					case '4': case '5': case '6':
-					case '7': case '8': case '9':
-						th.tmode = Number(ch);
-						break;
-					case 'R':
-						th.tmode = random1(tmodes - '0') + 1;
-						break;
-				}
-			});
+			if(oneToNine.includes(ch)){
+				setForAllThreadsInBank((th) => {
+					th.tmode = Number(ch);
+				});
+			};
+			if(ch === 'R'){
+				setForAllThreadsInBank((th) => {
+					th.tmode = random1(tmodes - '0') + 1
+				});
+			}
 			break;
 		case 'O':
 			ch = readkey(); 
@@ -134,18 +133,16 @@ export default function({
 		}
 		case 'R':
 			ch = readkey();
-			setForAllThreadsInBank(function(th){
-				switch (ch) {
-					case '1': case '2': case '3':
-					case '4': case '5': case '6':
-					case '7': case '8': case '9':
-						th.circturn = 10 - (Number(ch));
-						break;
-					case 'R':
-						th.circturn = random1(7) + 1;
-						break;
-				}
-			});
+			if(oneToNine.includes(ch)){
+				setForAllThreadsInBank((th) => {
+					th.circturn = 10 - (Number(ch));
+				});
+			};
+			if(ch === 'R'){
+				setForAllThreadsInBank((th) => {
+					th.circturn = random1(7) + 1;
+				});
+			}
 			break;
 	}
 }
