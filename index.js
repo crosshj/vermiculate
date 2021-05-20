@@ -17,8 +17,6 @@
 
 import main from './src/main.js';
 
-//const CURRENT_CONFIG = 5; //some problems with this * pickbank
-const CURRENT_CONFIG = 3;
 window.process = { argv: [,,CURRENT_CONFIG] };
 
 main({
