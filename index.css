@@ -5,6 +5,7 @@ body {
 	justify-content: center;
 	height: calc(100vh - 0em);
 	overflow: hidden;
+	background: black;
 }
 canvas {
 	/*background: #00000040;*/
