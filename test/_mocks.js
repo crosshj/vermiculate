@@ -1,4 +1,5 @@
-import { Mock } from './_framework.js';
+import { Mock } from 'https://cdn.skypack.dev/footils/fiug.test.js';
+//import { Mock } from './_framework.js';
 import constants from '../src/constants.js'
 
 export { Mock };

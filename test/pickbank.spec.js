@@ -1,5 +1,5 @@
 //show-preview
-import { describe, it, expect } from './_framework.js';
+import { describe, it, expect } from 'https://cdn.skypack.dev/footils/fiug.test.js';
 import { setupTest, readkeyMock, pickbankMock, Mock } from './_mocks.js';
 import { logJSON } from './_utilities.js';
 
