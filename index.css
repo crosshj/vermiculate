@@ -6,6 +6,7 @@ body {
 	height: calc(100vh - 0em);
 	overflow: hidden;
 	background: black;
+	margin: 0;
 }
 canvas {
 	/*background: #00000040;*/
